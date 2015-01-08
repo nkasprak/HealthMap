@@ -7,10 +7,15 @@
 #textLog {
 	font-family:Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
 }
+#theMap {
+	width:940px;	
+}
 </style>
 </head>
 <body>
 <pre>
+<div id="theMap">
+</div>
 <div id="textLog">
 </div>
 </pre>
@@ -65,10 +70,12 @@
 		var pp2013 = new postProcessing(model2013);
 		pp2013.calcOutOfCounty();
 		
-		var map = new mapDrawer(model2013);
+		var map = new mapDrawer(model2013,"theMap");
 		map.getData("FIPSpaths.php",function() {
 			map.draw();	
 		});
+		
+		a.log(model2013);
 		
 	});
 	
