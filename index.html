@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>County Map</title>
+<style>
+#textLog {
+	font-family:Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
+}
+</style>
+</head>
+<body>
+<pre>
+<div id="textLog">
+</div>
+</pre>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="d3/d3.js"></script>
+<script src="key.js"></script>
+<script src="logger.js"></script>
+<script src="datagrabber.js"></script>
+<script src="mapdrawer.js"></script>
+<script>
+
+(function() {
+	
+	var model2013 = {};
+	
+	var a = new logger("textLog");
+	
+	var requests = [
+		["get=NAME,DP03_0095E&for=state:*","state","population"],
+		["get=NAME,DP03_0099E&for=state:*","state","insurance"],
+		["get=NAME,DP03_0095E&for=county:*","county","population"],
+		["get=NAME,DP03_0099E&for=county:*","county","insurance"]
+	];
+	
+	var acs2013 = new dataGrabber(	cbpp_census_api_key,
+									"http://api.census.gov/data/2013/acs1?",
+									model2013,
+									requests);
+									
+	var postProcessing = function(model) {
+		this.model = model;
+		this.calcOutOfCounty = function() {
+			var state, county, stateObj, countyObj, runningStatePop, runningStateUns;
+			for (state in model.states) {
+				stateObj = model.states[state];
+				runningStatePop = stateObj.population;
+				runningStateUns = stateObj.uninsured;
+				for (county in stateObj.counties) {
+					countyObj = stateObj.counties[county];
+					runningStatePop -= countyObj.population;
+					runningStateUns -= countyObj.uninsured;
+				}
+				stateObj.outCounty = {};
+				stateObj.outCounty.population = runningStatePop;
+				stateObj.outCounty.uninsured = runningStateUns;
+			}
+		}
+	};
+									
+	acs2013.processRequests(function() {
+		var pp2013 = new postProcessing(model2013);
+		pp2013.calcOutOfCounty();
+		
+		var map = new mapDrawer(model2013);
+		map.getData("FIPSpaths.php",function() {
+			map.draw();	
+		});
+		
+	});
+	
+})();
+
+
+</script>
+</html>
