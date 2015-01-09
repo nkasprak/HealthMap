@@ -7,7 +7,7 @@ foreach ($mapDOM->getElementsByTagName('path') as $element) {
 	$attr = $element->attributes;
 	$path = $attr->getNamedItem('d')->value;
 	$id = $attr->getNamedItem('id')->value;
-	array_push($toReturn,array("FIPS"=>$id,"path"=>$path));
+	if (!in_array($id,array("State_Lines","separator"))) array_push($toReturn,array("FIPS"=>$id,"path"=>$path));
 };
 header('Content-Type: text/json');
 
