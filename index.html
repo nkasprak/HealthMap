@@ -4,18 +4,25 @@
 <meta charset="utf-8">
 <title>County Map</title>
 <style>
+body {
+	padding:0px;
+	margin:0px;	
+}
 #textLog {
 	font-family:Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
 }
 #theMap {
-	width:940px;	
+	width:98%;	
+	padding:1%;
+	margin:0px;
 }
 </style>
 </head>
 <body>
-<pre>
 <div id="theMap">
 </div>
+<pre>
+
 <div id="textLog">
 </div>
 </pre>
@@ -65,6 +72,13 @@ $(document).ready(function() {
 				stateObj.outCounty.uninsured = runningStateUns;
 			}
 		}
+		model.statesByFIPS = (function() {
+			var toReturn = {};
+			for (var state in model.states) {
+				toReturn[model.states[state]["FIPS"]*1] = state;	
+			}
+			return toReturn;
+		})();
 	};
 									
 	acs2013.processRequests(function() {
@@ -75,11 +89,7 @@ $(document).ready(function() {
 		map.getData("FIPSpaths.php",function() {
 			map.draw();	
 		});
-		
-		a.log(model2013);
-		
 	});
-
 });
 
 
