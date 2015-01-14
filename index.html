@@ -5,22 +5,48 @@
 <title>County Map</title>
 <style>
 body {
-	padding:0px;
-	margin:0px;	
+	padding: 0px;
+	margin: 0px;
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size:12px;
+}
+#inputs {
+	padding:5px;	
 }
 #textLog {
-	font-family:Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
+	font-family: Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
 }
 #theMap {
-	width:98%;	
-	padding:1%;
-	margin:0px;
+	width: 96%;
+	padding: 1%;
+	margin: 0px;
 }
 </style>
 </head>
 <body>
-<div id="theMap">
+<div id="inputs">
+    <p>Year:
+      <select id="yearSelect">
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+      </select>
+    </p>
+    <p>Dataset: (ACS data profile table id) 
+      <input id="dataset" type="text" size="12" value="DP03_0099"/> <a href="http://api.census.gov/data/2013/acs1/profile/variables.html">http://api.census.gov/data/2013/acs1/profile/variables.html</a>
+    </p>
+    <p>Denominator: (ACS data profile table id)
+      <input id="denominator" type="text" size="12" value="DP03_0095"/> <a href="http://api.census.gov/data/2013/acs1/profile/variables.html">http://api.census.gov/data/2013/acs1/profile/variables.html</a>
+    </p>
+    <p>Show: <br />
+      <input type="checkbox" id="showDots" checked/>
+      Dataset Dots (one dot =
+      <input id="dotEquals" type="text" size="6" value="10000"/>
+      )<br />
+      <input type="checkbox" id="showShading" checked>
+      Percentage Shading</p>
+    <button id="redraw">Redraw Map</button>
 </div>
+<div id="theMap"> </div>
 <pre>
 
 <div id="textLog">
@@ -33,63 +59,49 @@ body {
 <script src="pip.js"></script>
 <script src="logger.js"></script>
 <script src="datagrabber.js"></script>
+<script src="postprocessing.js"></script>
 <script src="mapdrawer.js"></script>
 <script>
 
 $(document).ready(function() {
 	
-	var model2013 = {};
-	
 	var a = new logger("textLog");
 	
-	var requests = [
-		["get=NAME,DP03_0095E&for=state:*","state","population"],
-		["get=NAME,DP03_0099E&for=state:*","state","insurance"],
-		["get=NAME,DP03_0095E&for=county:*","county","population"],
-		["get=NAME,DP03_0099E&for=county:*","county","insurance"]
-	];
-	
-	var acs2013 = new dataGrabber(	cbpp_census_api_key,
-									"http://api.census.gov/data/2013/acs1?",
-									model2013,
-									requests);
-									
-	var postProcessing = function(model) {
-		this.model = model;
-		this.calcOutOfCounty = function() {
-			var state, county, stateObj, countyObj, runningStatePop, runningStateUns;
-			for (state in model.states) {
-				stateObj = model.states[state];
-				runningStatePop = stateObj.population;
-				runningStateUns = stateObj.uninsured;
-				for (county in stateObj.counties) {
-					countyObj = stateObj.counties[county];
-					runningStatePop -= countyObj.population;
-					runningStateUns -= countyObj.uninsured;
-				}
-				stateObj.outCounty = {};
-				stateObj.outCounty.population = runningStatePop;
-				stateObj.outCounty.uninsured = runningStateUns;
-			}
-		}
-		model.statesByFIPS = (function() {
-			var toReturn = {};
-			for (var state in model.states) {
-				toReturn[model.states[state]["FIPS"]*1] = state;	
-			}
-			return toReturn;
-		})();
-	};
-									
-	acs2013.processRequests(function() {
-		var pp2013 = new postProcessing(model2013);
-		pp2013.calcOutOfCounty();
+	$("#redraw").click(function() {
 		
-		var map = new mapDrawer(model2013,"theMap");
-		map.getData("FIPSpaths.php",function() {
-			map.draw();	
+		var theModel = {};
+		
+		var requests = [
+			[$("#denominator").val(),"denominator"],
+			[$("#dataset").val(),"dataset"]
+		];
+		
+		var theGrabber = new dataGrabber(	cbpp_census_api_key,
+											"http://api.census.gov/data/"+$("#yearSelect").val() +"/acs1/profile/?",
+											theModel,
+											requests	);
+										
+								
+		theGrabber.processRequests(function() {
+			console.log(theModel);
+			var pp = new postProcessing(theModel);
+			pp.calcOutOfCounty();
+			
+			var theOptions = {
+				showDots:$("#showDots").is(":checked"),
+				useShading:$("#showShading").is(":checked"),
+				dotSize:$("#dotEquals").val()
+			};
+			
+			var map = new mapDrawer(theModel,"theMap",theOptions);
+			map.getData("FIPSpaths.php",function() {
+				map.draw();	
+			});
 		});
+	
 	});
+	
+	$("#redraw").click();
 });
 
 
