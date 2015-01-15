@@ -8,6 +8,7 @@ var mapDrawer = function(mdl, svg, custDisplayOptions) {
 		showDots:true,
 		useShading:true,
 		dotSize:10000,
+		moeThreshold:.2,
 		colors: {
 			low: "#ffffff",
 			high: "#048367"
@@ -85,7 +86,7 @@ var mapDrawer = function(mdl, svg, custDisplayOptions) {
 	this.draw = function() {
 		function returnColor(p,m) {
 			if (isNaN(p) || isNaN(m)) return "#c0c0c0";
-			if (m/p > 0.2) return "#c0c0c0";
+			if (m/p > displayOptions.moeThreshold) return "#c0c0c0";
 			var dataMax = custDisplayOptions.dataMax ? custDisplayOptions.dataMax : mdl.dataMax;
 			var dataMin = custDisplayOptions.dataMin ? custDisplayOptions.dataMin : mdl.dataMin;
 			var val = (p - dataMin)/(dataMax-dataMin);
@@ -100,8 +101,6 @@ var mapDrawer = function(mdl, svg, custDisplayOptions) {
 		var container = d3.select("#" + svg);
 		$("#" + svg + " svg").remove();
 		this.canvas = container.append("svg:svg")
-			//.attr("width",this.width)
-			//.attr("height",this.width*0.7)
 			.attr("viewBox","0 0 566 390");
 		d.dotList = [];
 		

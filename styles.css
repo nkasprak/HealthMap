@@ -1,0 +1,59 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	padding: 0px;
+	margin: 0px;
+	font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size:12px;
+}
+#search_container {
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	display:none;
+}
+#table_container {
+	width:100%;
+	height:800px;
+	position:relative;
+	overflow:auto;	
+}
+#search {
+	padding:3%;
+	border:2px solid #aaa;
+	margin:3%;
+	width:88%;
+	background-color:#fff;
+}
+
+#search table {
+	border-right:1px solid #ccc;
+	border-bottom:1px solid #ccc;
+	margin-top:3em;
+}
+
+#search table td{
+	vertical-align:top;
+	border-left:1px solid #ccc;
+	border-top:1px solid #ccc;
+	padding:3px;
+	margin:0px;
+}
+
+#inputs {
+	padding:5px;	
+}
+#textLog {
+	font-family: Consolas, "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", Monaco, "Courier New", monospace;
+}
+#theMap {
+	width: 96%;
+	padding: 1%;
+	margin: 1%;
+	border:1px solid #aaa;
+}
+#save {
+	margin:5px;	
+}
