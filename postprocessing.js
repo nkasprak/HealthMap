@@ -1,6 +1,10 @@
 var postProcessing = function(model) {
 	this.calcOutOfCounty = function() {
 		var state, county, stateObj, countyObj, runningStateDen, runningStateDat, percentage, runningStateVariance;
+		function NaNorNull(n) { //apparently JS thinks that null is a number
+			if (isNaN(n) || n===null) return true;
+			else return false;
+		};
 		for (state in model.states) {
 			stateObj = model.states[state];
 			runningStateDen = stateObj.denominator.estimate;
@@ -9,8 +13,8 @@ var postProcessing = function(model) {
 			runningStateDatVar = Math.pow(stateObj.data.moe,2);
 			for (county in stateObj.counties) {
 				countyObj = stateObj.counties[county];
-				if (!isNaN(countyObj.denominator.estimate) 	&& !isNaN(countyObj.data.estimate) &&
-					!isNaN(countyObj.denominator.moe)		&& !isNaN(countyObj.data.moe)) {
+				if (!NaNorNull(countyObj.denominator.estimate) 	&& !NaNorNull(countyObj.data.estimate) &&
+					!NaNorNull(countyObj.denominator.moe)		&& !NaNorNull(countyObj.data.moe)) {
 					runningStateDen -= countyObj.denominator.estimate;
 					runningStateDat -= countyObj.data.estimate;
 					runningStateDenVar += Math.pow(countyObj.denominator.moe,2);
@@ -26,6 +30,8 @@ var postProcessing = function(model) {
 					else model.dataMin = Math.min(model.dataMin,percentage);
 					if (typeof(model.dataMax)=="undefined") model.dataMax = percentage;
 					else model.dataMax = Math.max(model.dataMax,percentage);
+				} else {
+					delete(stateObj.counties[county]);	
 				}
 			}
 			

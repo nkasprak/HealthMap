@@ -9,8 +9,8 @@ var dataGrabber = function(key, url, model, requestList) {
 			n = n + '';
 			return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
 		};
-		var geography = theRequest[2];
-		var dataset = theRequest[1];
+		var geography = theRequest.geo;
+		var dataset = theRequest.role;
 		if (geography=="state") {
 			denominatorHandler = function(estOrMOE) {
 				if (typeof(model.states)=="undefined") model.states = {};
@@ -23,7 +23,7 @@ var dataGrabber = function(key, url, model, requestList) {
 					model.states[d[i][0]] = stateObj;
 				} else if (estOrMOE == "M") {
 					var stateObj = model.states[d[i][0]];
-					stateObj.denominator.moe = d[i][1];
+					stateObj.denominator.moe = d[i][1]=="*****"?0:d[i][1];
 				}
 			};
 			datasetHandler = function(estOrMOE) {
@@ -33,7 +33,7 @@ var dataGrabber = function(key, url, model, requestList) {
 					stateObj.data.estimate = d[i][1];
 				} else if (estOrMOE == "M") {
 					stateObj = model.states[d[i][0]];
-					stateObj.data.moe = d[i][1];
+					stateObj.data.moe = d[i][1]=="*****"?0:d[i][1];
 				}
 			};
 		}
@@ -48,7 +48,7 @@ var dataGrabber = function(key, url, model, requestList) {
 					model.states[stateName].counties[countyName] = countyObj;
 				} else if (estOrMOE == "M") {
 					countyObj = model.states[stateName].counties[countyName];
-					countyObj.denominator.moe = d[i][1];
+					countyObj.denominator.moe = d[i][1]=="*****"?0:d[i][1];
 				}
 			};
 			datasetHandler = function(estOrMOE,countyName,stateName) {
@@ -64,7 +64,7 @@ var dataGrabber = function(key, url, model, requestList) {
 					} else if (estOrMOE == "M") {	
 						countyObj = model.states[stateName].counties[countyName];
 						if (countyObj) {	
-							countyObj.data.moe = d[i][1];
+							countyObj.data.moe = d[i][1]=="*****"?0:d[i][1];
 						}
 					}
 				} catch (ex) {
@@ -83,11 +83,13 @@ var dataGrabber = function(key, url, model, requestList) {
 			if (dataset == "dataset") datasetHandler(estOrMOE,countyName,stateName);
 		};
 		for (var i=1;i<d.length;i++) {
-			processDataEntry(geography,theRequest[3]);
+			processDataEntry(geography,theRequest.mode);
 		}
 	};
 	this.makeRequest = function(request, callback) {
-		var geturl = this.url + "get=NAME," + request[0] + request[3] + "&for=" + request[2] + ":*&key=" + this.key;
+		var geturl = this.url + (request.universe == "profile" ? "profile/" : "") + 
+			"?get=NAME," + request.varName + request.mode + "&for=" + request.geo + ":*&key=" + this.key;
+		//console.log(geturl);
 		$.get(geturl, null, function(d) {
 			callback(d);
 		});
@@ -100,7 +102,13 @@ var dataGrabber = function(key, url, model, requestList) {
 		for (var i = 0;i<requestList.length;i++) {
 			for (j=0;j<geos.length;j++) {
 				for (var k=0;k<modes.length;k++) {
-					this.requestList.push([requestList[i][0],requestList[i][1],geos[j],modes[k]]);	
+					this.requestList.push({
+						varName:requestList[i][0],
+						role:requestList[i][1],
+						geo:geos[j],
+						mode:modes[k],
+						universe:requestList[i][2]
+					});	
 				}
 			};
 		};

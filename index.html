@@ -14,14 +14,21 @@
         <option value="2012">2012</option>
       </select>
     </p>
-    <p>Dataset: (ACS data table id) 
-      <input id="dataset" type="text" size="12" value="DP03_0099"/> 
+    <hr>
+    <h4>Data set</h4>
+    <p>
+      <input id="dataset" type="text" size="12" value="DP03_0099" disabled/>
+      <span id="dataset_label">HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage</span><br />
       <input type="radio" name="dataset" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a>  | <input type="radio" name="dataset" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile variables</a> <button id="search_dataset" class="search_btn">Search</button>
     </p>
-    <p>Denominator: (ACS data table id)
-      <input id="denominator" type="text" size="12" value="DP03_0095"/> 
+    <hr>
+    <h4>Denominator</h4>
+    <p>
+      <input id="denominator" type="text" size="12" value="DP03_0095" disabled/>
+       <span id="denominator_label">HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population</span><br /> 
       <input type="radio" name="denominator" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a> | <input type="radio" name="denominator" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile Variables</a> <button id="search_denominator" class="search_btn">Search</button>
     </p>
+    <hr>
     <p>Show: <br />
       <input type="checkbox" id="showDots" checked/>
       Dataset Dots (one dot =
@@ -70,26 +77,23 @@ Searching ACS data year <span class="year"></span> <span class="universe"></span
 <script src="postprocessing.js"></script>
 <script src="mapdrawer.js"></script>
 <script src="searcher.js"></script>
-
-
-
 <script>
-
+var theModel = {};
 $(document).ready(function() {
 	
 	var a = new logger("textLog");
 
 	$("#redraw").click(function() {
 		
-		var theModel = {};
+		
 		
 		var requests = [
-			[$("#denominator").val(),"denominator"],
-			[$("#dataset").val(),"dataset"]
+			[$("#denominator").val(),"denominator",$("input[name='denominator'][type='radio']:checked").val()],
+			[$("#dataset").val(),"dataset",$("input[name='denominator'][type='radio']:checked").val()]
 		];
 		
 		var theGrabber = new dataGrabber(	cbpp_census_api_key,
-											"http://api.census.gov/data/"+$("#yearSelect").val() +"/acs1/profile/?",
+											"http://api.census.gov/data/"+$("#yearSelect").val() +"/acs1/",
 											theModel,
 											requests	);
 										

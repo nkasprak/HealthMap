@@ -103,7 +103,6 @@ var mapDrawer = function(mdl, svg, custDisplayOptions) {
 		this.canvas = container.append("svg:svg")
 			.attr("viewBox","0 0 566 390");
 		d.dotList = [];
-		
 		for (var i=0;i<this.paths.length;i++) {
 			FIPS = this.paths[i]["FIPS"]*1;
 			color = "#bbb";
