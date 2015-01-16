@@ -10,8 +10,14 @@
 <div id="inputs">
     <p>Year:
       <select id="yearSelect">
-        <option value="2013">2013</option>
-        <option value="2012">2012</option>
+        <option value="2013_1">2013</option>
+        <option value="2012_1">2012</option>
+        <option value="2013_3">2011-2013</option>
+        <option value="2012_3">2010-2012</option>
+        <option value="2013_5">2009-2013</option>
+        <option value="2012_5">2008-2012</option>
+        <option value="2011_5">2007-2011</option>
+        <option value="2010_5">2006-2010</option>
       </select>
     </p>
     <hr>
@@ -19,14 +25,14 @@
     <p>
       <input id="dataset" type="text" size="12" value="DP03_0099" disabled/>
       <span id="dataset_label">HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population!!No health insurance coverage</span><br />
-      <input type="radio" name="dataset" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a>  | <input type="radio" name="dataset" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile variables</a> <button id="search_dataset" class="search_btn">Search</button>
+      <input type="radio" class="universePicker" name="dataset" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a>  | <input type="radio"class="universePicker"  name="dataset" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile variables</a> <button id="search_dataset" class="search_btn">Search</button>
     </p>
     <hr>
     <h4>Denominator</h4>
     <p>
       <input id="denominator" type="text" size="12" value="DP03_0095" disabled/>
        <span id="denominator_label">HEALTH INSURANCE COVERAGE!!Civilian noninstitutionalized population</span><br /> 
-      <input type="radio" name="denominator" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a> | <input type="radio" name="denominator" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile Variables</a> <button id="search_denominator" class="search_btn">Search</button>
+      <input type="radio" class="universePicker" name="denominator" value="summary"><a href="http://api.census.gov/data/2013/acs1/variables.html" target="_blank">Summary variables</a> | <input type="radio"  class="universePicker" name="denominator" value="profile" checked><a href="http://api.census.gov/data/2013/acs1/profile/variables.html" target="_blank">Profile Variables</a> <button id="search_denominator" class="search_btn">Search</button>
     </p>
     <hr>
     <p>Show: <br />
@@ -49,7 +55,7 @@
 
 
 <div id="search">
-Searching ACS data year <span class="year"></span> <span class="universe"></span> variables for use as <span class="type"></span><br />
+Searching ACS data year <span class="year"></span> <span class="timeFrame"></span>-year <span class="universe"></span> variables for use as <span class="type"></span><br />
 <input type="text" placeholder="Search..." id="search_term" size="40" />&nbsp;&nbsp;<button id="search_go">Go</button>&nbsp;&nbsp;<button id="search_cancel">Cancel</button>
 <div id="table_container">
 </div>
@@ -92,8 +98,10 @@ $(document).ready(function() {
 			[$("#dataset").val(),"dataset",$("input[name='denominator'][type='radio']:checked").val()]
 		];
 		
+		var yearParms = $("#yearSelect").val().split("_");
+		
 		var theGrabber = new dataGrabber(	cbpp_census_api_key,
-											"http://api.census.gov/data/"+$("#yearSelect").val() +"/acs1/",
+											"http://api.census.gov/data/"+yearParms[0] +"/acs" + yearParms[1] + "/",
 											theModel,
 											requests	);
 										

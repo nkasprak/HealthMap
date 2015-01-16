@@ -1,8 +1,9 @@
 <?php
 
 $year = preg_replace("/[^0-9]/", '',$_GET["year"]);
+$timeframe = preg_replace("/[^0-9]/", '',$_GET["timeframe"]);
 $universe = $_GET["universe"] == "profile" ? "profile" : "summary";
-$file = "/".$universe.$year.".json";
+$file = "/".$universe.$year."_".$timeframe.".json";
 $cleanedSearch = preg_replace("/[^A-Za-z0-9 _]/", '', $_GET["search"]);
 $search = explode(" ",$cleanedSearch);
 $variables = json_decode(file_get_contents(__DIR__ . $file))->variables;

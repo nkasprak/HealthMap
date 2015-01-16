@@ -1,10 +1,16 @@
 // JavaScript Document
 
-var searcher = {
-	type:"dataset",
-	universe:$("input[name='dataset'][type='radio']:checked").val(),
-	year:$("#yearSelect").val()
-};
+var searcher = (function() {
+	var yearParms = $("#yearSelect").val().split("_");
+	var year = yearParms[0];
+	var timeFrame = yearParms[1];
+	return {
+		type:"dataset",
+		universe:$("input[name='dataset'][type='radio']:checked").val(),
+		year:year,
+		timeFrame:timeFrame
+	}
+})();
 
 $(".search_btn").click(function() {
 	if ($(this).attr("id")=="search_dataset") searcher.type="dataset";
@@ -22,14 +28,23 @@ $("#search_cancel").click(function() {
 });
 
 $("#yearSelect").change(function() {
-	searcher.year = $(this).val();
+	var yearParms = $(this).val().split("_");
+	searcher.year = yearParms[0];
+	searcher.timeFrame = yearParms[1];
+	console.log(searcher);
+	if (searcher.year < 2012) {
+		$("input.universePicker[value='summary']").prop("checked",true);
+		$("input.universePicker").prop("disabled",true);	
+	} else {
+		$("input.universePicker").prop("disabled",false);
+	}
 });
 
 $("#search_go").click(function() {
 	$("#search table").remove();
 	var searchTerms = $("#search_term").val().replace(/[^A-Za-z0-9 _]/g,'');
 	searchTerms = searchTerms.replace(/ /g,"%20");
-	var request_url = "search.php?search=" + searchTerms + "&universe=" + searcher.universe + "&year=" + searcher.year;
+	var request_url = "search.php?search=" + searchTerms + "&universe=" + searcher.universe + "&year=" + searcher.year + "&timeframe=" + searcher.timeFrame;
 	console.log(request_url);
 	$.getJSON(request_url,null,function(d) {
 		var table = $("<table cellspacing='0'></table>"),tr,td;
